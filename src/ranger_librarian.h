@@ -19,6 +19,7 @@
 
 // other
 #include "label_reader.h"
+#include <cmath>
 
 // camera parameters
 static const int IMG_WIDTH = 640;           //all formats: "luvcview -d /dev/video0 -L"
@@ -30,7 +31,7 @@ static const int QUEUE_MAX_LENGTH = 10;     // how many historical values to kee
 static const double QUEUE_ACCEPT_RATE = 0.7;// last repeated element acceptance rate
 
 // node rate
-static const int NODE_RATE = 10;
+static const int NODE_RATE = 31;
 
 using std::string;
 using namespace cv;
@@ -90,11 +91,16 @@ private:
     int weight_max_allowed;         // maximum weight allowed
 
 
+    // read label parameters
+    int read_time_label;            // time (s) to wait for reading a book label
+
+
 
     //CLASS Member variables
 
     // Label reader object
     LabelReader lr_;
+    cv_bridge::CvImagePtr cv_ptr;
 
     // control boolean variables
     bool depth_read_label_;
@@ -103,10 +109,18 @@ private:
 
 
     int depth_below_counter_;
-    vector<Book> book_list_;
+    long int depth_below_time_;
+
+
+
+
+
 
     double weight_change_;
     double weight_last_;
+
+
+    vector<Book> book_list_;
 
     // book object
     string last_label_author_;
@@ -119,6 +133,11 @@ private:
     boost::circular_buffer<double> weight_measures;
     boost::circular_buffer<double> depth_measures;
 
+
+    // methods
+    bool read_label();
+    bool read_book_weight();
+    double weight_homogeneous(int frame_begin, int window_size);
 
 };
 
