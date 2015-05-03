@@ -20,17 +20,39 @@ find_library(Tesseract_LIBRARIES NAMES tesseract_full tesseract_api tesseract
   
   
 # Find all required modules for compilation
+# catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
 	sensor_msgs
 	cv_bridge
 	roscpp
+	rospy
 	std_msgs
-	image_transport)
+	image_transport
+	message_generation
+)
+
+################################################
+## Declare ROS messages, services and actions ##
+################################################
+
+# Generate messages in the 'msg' folder
+add_message_files(
+	FILES
+	WeightFiltered.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
-catkin_package()
+# runtime dependencies
+catkin_package(
+	CATKIN_DEPENDS message_runtime
+)
 
 
 ###########
@@ -48,12 +70,17 @@ include_directories(
 #add_executable( minimal_ocr minimal_ocr.cpp)
 #target_link_libraries( minimal_ocr ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable( video_ocr video_ocr.cpp include/utils.cpp)
-target_link_libraries( video_ocr ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
+#add_executable( video_ocr video_ocr.cpp include/utils.cpp)
+#target_link_libraries( video_ocr ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
 
 add_executable( main src/main.cpp src/label_reader.cpp src/ranger_librarian.cpp)
 target_link_libraries( main ${catkin_LIBRARIES} ${Tesseract_LIBRARIES} )
 
+add_executable( depth_below_timer src/depth_below_timer_node.cpp)
+target_link_libraries( depth_below_timer ${catkin_LIBRARIES} )
+
+add_executable( weight_change_monitor src/weight_change_monitor.cpp)
+target_link_libraries( weight_change_monitor ${catkin_LIBRARIES} )
 
 install(TARGETS main
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} )
