@@ -31,19 +31,16 @@ using namespace cv;
 /**@brief Flag for printing debug messages.*/
 bool const DEBUG = false;
 
-/**@brief Camera parameters.*/
-static const int IMG_WIDTH = 640;           //all formats: "luvcview -d /dev/video0 -L"
-static const int IMG_HEIGHT = 480;
-
-/**@brief OCR parameters.*/
-static const int OCR_FRAME_SKIP = 5;        // parameter to process each xx frame with OCR
-static const int QUEUE_MAX_LENGTH = 10;     // how many historical values to keep in queue
-static const double QUEUE_ACCEPT_RATE = 0.7;// last repeated element acceptance rate
 
 /**@brief Default rosparam server values.*/
 static const string RGB_IMAGE_TOPIC = "/usb_cam/image_raw";
 static const string SCALE_TOPIC = "/scale";
 static const string SCALE_FILTERED_TOPIC = "/scale_filtered";
+
+/**@brief OCR parameters.*/
+static const int OCR_FRAME_SKIP = 5;        // parameter to process each xx frame with OCR
+static const int QUEUE_MAX_LENGTH = 10;     // how many historical values to keep in queue
+static const double QUEUE_ACCEPT_RATE = 0.7;// last repeated element acceptance rate
 
 // node rate
 static const int NODE_RATE = 31;

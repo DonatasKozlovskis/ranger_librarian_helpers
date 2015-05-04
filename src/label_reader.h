@@ -68,13 +68,14 @@ private:
   bool checkNumberAuthor(boost::circular_buffer<string> &detectedCallNumbersRoi,
                          boost::circular_buffer<string> &detectedAuthorsRoi);
   
+  void defineLabelRegion(int img_width, int img_height);
 public:
   // constructors
   LabelReader(int ocr_frame_skip,
               int queue_lenght,
               double queue_accept_rate,
-              int img_width,
-              int img_height);
+              int img_width = 0,
+              int img_height = 0);
   // destructor
   ~LabelReader();
 

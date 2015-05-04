@@ -5,7 +5,7 @@ RangerLibrarian::RangerLibrarian():
     nh_("~"), it_(nh_), nh_rate_(NODE_RATE),
     read_label_(false), read_label_success_(false), weight_max_reached_(false),
 
-    lr_(OCR_FRAME_SKIP, QUEUE_MAX_LENGTH, QUEUE_ACCEPT_RATE, IMG_WIDTH, IMG_HEIGHT)
+    lr_(OCR_FRAME_SKIP, QUEUE_MAX_LENGTH, QUEUE_ACCEPT_RATE)
 
 {
     string rgb_image_topic;
@@ -68,6 +68,7 @@ void RangerLibrarian::rgb_callback(const sensor_msgs::ImageConstPtr& msg) {
     cv::Mat userImage = cv_ptr->image.clone();
     lr_.prepareUserImage(userImage);
 
+    read_label_success_ = lr_.processFrame(cv_ptr->image);
 
     if (read_label_) {
         putText(cv_ptr->image, "Reading", cv::Point(15,15), CV_FONT_HERSHEY_COMPLEX, 2, CV_RGB(0,0,250));
@@ -193,6 +194,7 @@ int RangerLibrarian::run() {
 
 bool RangerLibrarian::book_read_label() {
 
+    read_label_success_ = false;
     bool read_success = false;
 
     ros::Time start_time = ros::Time::now();
@@ -203,7 +205,7 @@ bool RangerLibrarian::book_read_label() {
 
     while (!read_success && (run_time-start_time < ros::Duration(time_wait_read_label_)) && ros::ok() ) {
 
-        read_success = lr_.processFrame(cv_ptr->image);
+        read_success = read_label_success_;
 
         ros::getGlobalCallbackQueue()->callAvailable(ros::WallDuration(0.1));
         run_time = ros::Time::now();

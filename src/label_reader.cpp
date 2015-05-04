@@ -28,15 +28,7 @@ LabelReader::LabelReader(
     // set regular expression
     tessRegexpr = "\\b([0-9]{3})\\b.*(\\b[A-Z]{2,3})";
 
-    // create two active regions in the image( square and long rectangle for OCR processing)
-    int label_square_wh = std::min(imgWidth, imgHeight)/7*3;
-    int label_rect_h = std::min(imgWidth, imgHeight)/7*1.5;
-    int label_rect_w = std::min(imgWidth, label_rect_h*4); // 1:4
-
-    // SQUARE
-    labelRegionSquare = cv::Rect( (imgWidth-label_square_wh)/2, (imgHeight-label_square_wh)/2, label_square_wh, label_square_wh);
-    // RECT
-    labelRegionRect = cv::Rect( (imgWidth-label_rect_w)/2, (imgHeight-label_rect_h)/2, label_rect_w, label_rect_h);
+    defineLabelRegion(imgWidth, imgHeight);
 
 }
 
@@ -76,8 +68,26 @@ string LabelReader::getAuthor() {
     return detectedAuthor;
 }
 
+void LabelReader::defineLabelRegion(int img_width, int img_height) {
+    imgWidth = img_width;
+    imgHeight = img_height;
+    // create two active regions in the image( square and long rectangle for OCR processing)
+    int label_square_wh = std::min(imgWidth, imgHeight)/7*3;
+    int label_rect_h = std::min(imgWidth, imgHeight)/7*1.5;
+    int label_rect_w = std::min(imgWidth, label_rect_h*4); // 1:4
+
+    // SQUARE
+    labelRegionSquare = cv::Rect( (imgWidth-label_square_wh)/2, (imgHeight-label_square_wh)/2, label_square_wh, label_square_wh);
+    // RECT
+    labelRegionRect = cv::Rect( (imgWidth-label_rect_w)/2, (imgHeight-label_rect_h)/2, label_rect_w, label_rect_h);
+
+}
 
 bool LabelReader::processFrame(cv::Mat &inputFrame) {
+
+    if (inputFrame.cols != imgWidth || inputFrame.rows != imgHeight) {
+        defineLabelRegion(inputFrame.cols, inputFrame.rows);
+    }
 
     bool readSuccess = false;
 
@@ -120,6 +130,10 @@ bool LabelReader::processFrame(cv::Mat &inputFrame) {
 
 /// PREPARE USER OUTPUT IMAGE
 void LabelReader::prepareUserImage(cv::Mat &inputFrame) {
+
+    if (inputFrame.cols != imgWidth || inputFrame.rows != imgHeight) {
+        defineLabelRegion(inputFrame.cols, inputFrame.rows);
+    }
 
     // flip (mirror effect) for better user expierence
     cv::Mat frameFlipped;
