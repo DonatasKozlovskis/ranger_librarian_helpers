@@ -51,7 +51,7 @@ generate_messages(
 ###################################
 # runtime dependencies
 catkin_package(
-	CATKIN_DEPENDS message_runtime
+        CATKIN_DEPENDS message_runtime
 )
 
 
@@ -76,11 +76,20 @@ include_directories(
 add_executable( main src/main.cpp src/label_reader.cpp src/ranger_librarian.cpp)
 target_link_libraries( main ${catkin_LIBRARIES} ${Tesseract_LIBRARIES} )
 
-add_executable( depth_below_timer src/depth_below_timer_node.cpp)
+add_executable( depth_below_timer src/depth_below_timer.cpp)
 target_link_libraries( depth_below_timer ${catkin_LIBRARIES} )
 
 add_executable( weight_change_monitor src/weight_change_monitor.cpp)
 target_link_libraries( weight_change_monitor ${catkin_LIBRARIES} )
 
-install(TARGETS main
+add_executable( user_view_creator src/user_view_creator.cpp)
+target_link_libraries( user_view_creator ${catkin_LIBRARIES} )
+
+install(TARGETS main depth_below_timer weight_change_monitor
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} )
+
+
+
+# Instructions to install launch files
+install(DIRECTORY launch/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch )
