@@ -1,0 +1,9 @@
+#goal definition
+string camera_topic
+---
+#result definition
+string author
+string call_number
+---
+#feedback
+int32 sample
