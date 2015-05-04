@@ -119,7 +119,7 @@ public:
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "label_reading");
+    ros::init(argc, argv, "label_reader");
 
     LabelReadingAction label_reading(ros::this_node::getName());
     ROS_INFO("Starting label reading server");
