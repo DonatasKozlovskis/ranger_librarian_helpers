@@ -15,6 +15,7 @@
 using std::string;
 
 // default param values
+static const string SCALE_TOPIC = "/scale";
 static const double SCALE_SENSITIVITY = 0.15;
 static const int SUBSET_SIZE = 4;
 
@@ -39,7 +40,7 @@ private:
     double weight_stable_;                          // current stable weight value
     double weight_change_;                           // weight  value difference between current and last stable weigths
     ros::Time change_time_;                          // change time
-    bool change_positive_;                           // change sign
+    bool weight_changed_;                           // change occured?
 
 
     // methods
@@ -60,12 +61,12 @@ WeightChangeMonitor::WeightChangeMonitor() :
     weight_stable_(0),
     weight_change_(0),
     change_time_(ros::Time::now()),
-    change_positive_(true)
+    weight_changed_(false)
 {
     string scale_topic;
 
     // get topic name for subscriber, if not use default
-    nh_.param<string>("scale", scale_topic, "/scale");
+    nh_.param<string>("scale_topic", scale_topic, SCALE_TOPIC);
 
     // get the rest of parameters
     nh_.param<double>("scale_sensitivity", scale_sensitivity_, double(SCALE_SENSITIVITY));
@@ -97,6 +98,8 @@ void WeightChangeMonitor::scale_callback(const std_msgs::Float64& msg) {
 
     double weight_stable_new;
     bool weight_equal = true;
+    weight_changed_ = false;
+
 
     for (auto it:weight_measures) {
 
@@ -115,25 +118,14 @@ void WeightChangeMonitor::scale_callback(const std_msgs::Float64& msg) {
 
     if (weight_equal) {
 
-//        weight_stable_new = 0;
         weight_stable_new = weight_median();
 
 
         double weight_stable_diff = weight_stable_new - weight_stable_;
-//        if (weight_stable_diff > scale_sensitivity_) {
-//            weight_change = 1;
-//        } else if (weight_stable_diff < -scale_sensitivity_) {
-//            weight_change = -1;
-//        } else {
-//            weight_change = 0;
-//        }
-//        if (weight_change!=0) {
-//        }
-//        weight_stable_ = (weight_change==0) ? weight_stable_ : weight_stable_new;
 
         if (std::abs(weight_stable_diff) > scale_sensitivity_) {
             weight_change_ = weight_stable_diff;
-            change_positive_ = (weight_stable_diff>0) ? true : false;
+            weight_changed_ = true;
             weight_stable_ = weight_stable_new;
             change_time_ = ros::Time::now();
 
@@ -149,7 +141,7 @@ void WeightChangeMonitor::scale_callback(const std_msgs::Float64& msg) {
 
     // assign data
     weight_msg.change_time = change_time_;
-    weight_msg.change_positive = change_positive_;
+    weight_msg.weight_changed = weight_changed_;
 
     weight_msg.weight_stable = weight_stable_;
     weight_msg.weight_change = weight_change_;

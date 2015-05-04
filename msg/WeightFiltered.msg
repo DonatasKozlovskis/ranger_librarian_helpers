@@ -9,8 +9,8 @@
 # here shows last time weight change has been measuered
 time change_time
 
-# was a positive (1) - negative (0) change
-bool change_positive
+# occured a change now
+bool weight_changed
 
 # current stable weigth measure
 float64 weight_stable
