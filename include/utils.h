@@ -6,24 +6,23 @@
 #include <tesseract/baseapi.h>
 
 #include <string>
-#include <boost/circular_buffer.hpp>            // circular queue
-#include <boost/regex.hpp>                      // regex
-#include <boost/algorithm/string/trim_all.hpp>  // trim all
-#include <algorithm>                            // replace
+
+using std::string;
+
+// Struct for books
+struct Book {
+    string author;
+    string callNumber;
+    double weight;
+};
+
+// navigator ACTIONS
+enum NavigatorAction
+{
+    NAVIGATOR_STOP,
+    NAVIGATOR_MOVE,
+    NAVIGATOR_FINISH
+};
 
 
-using namespace std;
-
-/**@brief Wrap an angle to lie in \f$ (-\pi, \pi) \f$.
-
-  Should be used
-  @param imRoi
-  @return nothing.*/
-void getNumberAuthorFromRoi(cv::Mat imRoi, tesseract::TessBaseAPI &tessAPI,
-                            boost::circular_buffer<string> &detectedCallNumbersRoi,
-                            boost::circular_buffer<string> &detectedAuthorsRoi);
-
-bool checkNumberAuthor(boost::circular_buffer<string> &detectedCallNumbersRoi,
-                            boost::circular_buffer<string> &detectedAuthorsRoi,
-                            int maxLength, double acceptRate);
 #endif // UTILS_H

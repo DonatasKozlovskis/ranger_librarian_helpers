@@ -5,8 +5,8 @@ RangerLibrarian::RangerLibrarian():
     nh_("~"), it_(nh_), nh_rate_(NODE_RATE),
     read_label_(false), read_label_success_(false), weight_max_reached_(false),
 
-    lr_(OCR_FRAME_SKIP, QUEUE_MAX_LENGTH, QUEUE_ACCEPT_RATE)
-
+    lr_(OCR_FRAME_SKIP, QUEUE_MAX_LENGTH, QUEUE_ACCEPT_RATE),
+    ac("label_reader", true)
 {
     string rgb_image_topic;
     string depth_low_duration;
@@ -38,6 +38,10 @@ RangerLibrarian::RangerLibrarian():
     nh_.param("time_wait_read_label", time_wait_read_label_, int(5));
     nh_.param("time_wait_add_book", time_wait_add_book_,    int(8));
 
+    ROS_INFO("Waiting for label reading action server to start.");
+    ac.waitForServer();
+    ROS_INFO("Label reading action server started");
+
 }
 
 /// DESTRUCTOR
@@ -68,8 +72,6 @@ void RangerLibrarian::rgb_callback(const sensor_msgs::ImageConstPtr& msg) {
     cv::Mat userImage = cv_ptr->image.clone();
     lr_.prepareUserImage(userImage);
 
-    read_label_success_ = lr_.processFrame(cv_ptr->image);
-
     if (read_label_) {
         putText(cv_ptr->image, "Reading", cv::Point(15,15), CV_FONT_HERSHEY_COMPLEX, 2, CV_RGB(0,0,250));
     }
@@ -84,12 +86,12 @@ void RangerLibrarian::rgb_callback(const sensor_msgs::ImageConstPtr& msg) {
 }
 
 void RangerLibrarian::depth_low_duration_callback(const std_msgs::Float64& msg) {
-
+// UNUSED
 //    if (DEBUG) {
 //        printf("depth_below_duration msg received:  %0.2f\n", msg.data);
 //    }
 
-    double depth_below_duration = msg.data;
+//    double depth_below_duration = msg.data;
 
 //    if (depth_below_duration > time_depth_low_read_) {
 //        read_label_ = true;
@@ -114,17 +116,28 @@ void RangerLibrarian::depth_low_action_callback(const std_msgs::String& msg) {
 
     if (read_label_) {
         std::cout <<  "try read label " << std::endl;
-        read_label_success_ = book_read_label();
-        if (read_label_success_) {
-             std::cout <<  "read label success! waiting for book " << std::endl;
+        // send a goal to the action
+        ranger_librarian::LabelReadingGoal goal;
+        goal.camera_topic = RGB_IMAGE_TOPIC;
+        ac.sendGoal(goal);
 
-             if (book_read_weight()) {
-                 std::cout <<  "read book added! " << std::endl;
-             } else {
-                 std::cout <<  "read book add failed! " << std::endl;
-             }
+        //wait for the action to return
+        bool read_label_success_ = ac.waitForResult(ros::Duration(time_wait_read_label_));
+        if (read_label_success_) {
+            ranger_librarian::LabelReadingResultConstPtr result = ac.getResult();
+            ROS_INFO("Action finished: %s", result->author.c_str());
+
+            std::cout <<  "read label success! waiting for book " << std::endl;
+
+            if (book_read_weight()) {
+                std::cout <<  "read book added! " << std::endl;
+            } else {
+                std::cout <<  "read book add failed! " << std::endl;
+            }
+
+
         } else {
-            std::cout <<  "read label failed! " << std::endl;
+             std::cout <<  "read label failed, timeout " << std::endl;
         }
 
         read_label_ = false;

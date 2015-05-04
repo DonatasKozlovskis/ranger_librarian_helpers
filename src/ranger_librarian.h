@@ -11,6 +11,9 @@
 #include <std_msgs/String.h>
 #include <ranger_librarian/WeightFiltered.h>
 
+#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/terminal_state.h>
+#include "ranger_librarian/LabelReadingAction.h"
 
 //CV bridge
 #include <image_transport/image_transport.h>
@@ -23,6 +26,8 @@
 
 // other
 #include "label_reader.h"
+#include "include/utils.h"
+#include <boost/thread.hpp>
 #include <cmath>
 
 using std::string;
@@ -31,13 +36,12 @@ using namespace cv;
 /**@brief Flag for printing debug messages.*/
 bool const DEBUG = false;
 
-
 /**@brief Default rosparam server values.*/
 static const string RGB_IMAGE_TOPIC = "/usb_cam/image_raw";
 static const string SCALE_TOPIC = "/scale";
 static const string SCALE_FILTERED_TOPIC = "/scale_filtered";
 
-/**@brief OCR parameters.*/
+/**@brief Default OCR parameters.*/
 static const int OCR_FRAME_SKIP = 5;        // parameter to process each xx frame with OCR
 static const int QUEUE_MAX_LENGTH = 10;     // how many historical values to keep in queue
 static const double QUEUE_ACCEPT_RATE = 0.7;// last repeated element acceptance rate
@@ -45,26 +49,10 @@ static const double QUEUE_ACCEPT_RATE = 0.7;// last repeated element acceptance 
 // node rate
 static const int NODE_RATE = 31;
 
-// Struct for books
-struct Book {
-    string author;
-    string callNumber;
-    double weight;
-};
-
-// navigator ACTIONS
-enum NavigatorAction
-{
-    NAVIGATOR_STOP,
-    NAVIGATOR_MOVE,
-    NAVIGATOR_FINISH
-};
 
 /// CLASS
 class RangerLibrarian
 {
-
-
 public:
     // Constructor and desctructor
     RangerLibrarian();
@@ -114,10 +102,13 @@ private:
     int time_wait_add_book_;             // time (s) to wait for adding a book
 
 
-    //CLASS Member variables
+    //CLASS Members
 
     // Label reader object
     LabelReader lr_;
+    actionlib::SimpleActionClient<ranger_librarian::LabelReadingAction> ac;
+
+
     // pointer to obtained cv image
     cv_bridge::CvImagePtr cv_ptr;
 
