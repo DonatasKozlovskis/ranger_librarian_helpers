@@ -62,9 +62,9 @@ DepthBelowTimeNode::DepthBelowTimeNode() :
     // get the rest of parameters
     nh_.param<double>("depth_below_threshold", depth_below_threshold_, double(0.2));
 
-    nh_.param<double>("depth_below_slow",   depth_low_time_slow_,   double(0.5));
-    nh_.param<double>("depth_below_read",   depth_low_time_stop_,   double(2));
-    nh_.param<double>("depth_below_stuck",  depth_low_time_stuck_,  double(10));
+    nh_.param<double>("depth_low_time_slow",   depth_low_time_slow_,   double(0.5));
+    nh_.param<double>("depth_low_time_read",   depth_low_time_stop_,   double(2));
+    nh_.param<double>("depth_low_time_stuck",  depth_low_time_stuck_,  double(10));
 
     // Subscriber
     sub_depth_  = it_.subscribe(depth_image_topic, 1, &DepthBelowTimeNode::depth_callback, this);
