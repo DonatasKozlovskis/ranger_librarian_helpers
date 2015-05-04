@@ -22,12 +22,13 @@ find_library(Tesseract_LIBRARIES NAMES tesseract_full tesseract_api tesseract
 # Find all required modules for compilation
 # catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
-	sensor_msgs
 	cv_bridge
 	roscpp
 	rospy
-	std_msgs
 	image_transport
+	actionlib
+	std_msgs
+	sensor_msgs
 	message_generation
 )
 
@@ -40,18 +41,24 @@ add_message_files(
 	FILES
 	WeightFiltered.msg
 )
-
+# Generate actions in the 'action' folder
+add_action_files(
+  DIRECTORY action
+  FILES LabelReading.action
+)
 generate_messages(
   DEPENDENCIES
   std_msgs
+  actionlib_msgs
 )
+
 
 ###################################
 ## catkin specific configuration ##
 ###################################
 # runtime dependencies
 catkin_package(
-        CATKIN_DEPENDS message_runtime
+        CATKIN_DEPENDS message_runtime actionlib_msgs
 )
 
 
@@ -85,7 +92,14 @@ target_link_libraries( weight_change_monitor ${catkin_LIBRARIES} )
 add_executable( user_view_creator src/user_view_creator.cpp)
 target_link_libraries( user_view_creator ${catkin_LIBRARIES} )
 
-install(TARGETS main depth_below_timer weight_change_monitor
+add_executable(label_reader_server src/label_reader_server.cpp src/label_reader.cpp)
+target_link_libraries(label_reader_server ${catkin_LIBRARIES} ${Tesseract_LIBRARIES})
+
+
+### install
+
+install(
+    TARGETS main depth_below_timer weight_change_monitor label_reader_server
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} )
 
 
