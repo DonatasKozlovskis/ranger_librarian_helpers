@@ -27,16 +27,16 @@ RangerLibrarian::RangerLibrarian():
     sub_rgb_    = it_.subscribe(rgb_image_topic, 1, &RangerLibrarian::rgb_callback, this);
 
     sub_depth_low_duration_  = nh_.subscribe<const std_msgs::Float64&>(depth_low_duration, 1, &RangerLibrarian::depth_low_duration_callback, this);
-    sub_depth_low_action_  = nh_.subscribe<const std_msgs::String&>(depth_low_action, 2, &RangerLibrarian::depth_low_action_callback, this);
+    sub_depth_low_action_  =   nh_.subscribe<const std_msgs::String&>(depth_low_action, 1, &RangerLibrarian::depth_low_action_callback, this);
 
     sub_scale_  =           nh_.subscribe<const std_msgs::Float64&>(scale_topic, 1, &RangerLibrarian::scale_callback, this);
     sub_scale_filtered_  =  nh_.subscribe<const ranger_librarian::WeightFiltered&>(scale_filtered_topic, 1, &RangerLibrarian::scale_filtered_callback, this);
 
     // get the rest of paramters
-    nh_.param("weight_max_allowed", weight_max_allowed_,     int(5));
-    nh_.param("time_depth_low_read", time_depth_low_read_,  int(2));
-    nh_.param("time_wait_read_label", time_wait_read_label_, int(5));
-    nh_.param("time_wait_add_book", time_wait_add_book_,    int(8));
+    nh_.param("weight_max_allowed", weight_max_allowed_,        double(5));
+    nh_.param("time_depth_low_read", time_depth_low_read_,      double(1.5));
+    nh_.param("time_wait_read_label", time_wait_read_label_,    double(6));
+    nh_.param("time_wait_add_book", time_wait_add_book_,        double(8));
 
     ROS_INFO("Waiting for label reading action server to start.");
     ac.waitForServer();
@@ -58,8 +58,6 @@ void RangerLibrarian::rgb_callback(const sensor_msgs::ImageConstPtr& msg) {
         printf("rgb_callback msg received.\n");
     }
 
-
-
     // get mutable cv image from cv_bridge::CvImagePtr cv_ptr;
     try {
         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -72,12 +70,10 @@ void RangerLibrarian::rgb_callback(const sensor_msgs::ImageConstPtr& msg) {
     cv::Mat userImage = cv_ptr->image.clone();
     lr_.prepareUserImage(userImage);
 
-    if (read_label_) {
-        putText(cv_ptr->image, "Reading", cv::Point(15,15), CV_FONT_HERSHEY_COMPLEX, 2, CV_RGB(0,0,250));
-    }
-    if (read_label_success_) {
-        putText(cv_ptr->image, "read_label_success_", cv::Point(15,15), CV_FONT_HERSHEY_COMPLEX, 2, CV_RGB(0,0,250));
-    }
+
+    // process frame with orc if needed
+    read_label_success_ = lr_.processFrame(cv_ptr->image);
+
 
     // Update GUI Window
     namedWindow("OUTPUT_WINDOW", WINDOW_AUTOSIZE);
@@ -86,7 +82,7 @@ void RangerLibrarian::rgb_callback(const sensor_msgs::ImageConstPtr& msg) {
 }
 
 void RangerLibrarian::depth_low_duration_callback(const std_msgs::Float64& msg) {
-// UNUSED
+//    // UNUSED
 //    if (DEBUG) {
 //        printf("depth_below_duration msg received:  %0.2f\n", msg.data);
 //    }
@@ -108,42 +104,32 @@ void RangerLibrarian::depth_low_action_callback(const std_msgs::String& msg) {
         printf("depth_low_action msg received:  %s\n", depth_low_action.c_str());
     }
 
-    if (depth_low_action.compare("stop")==0 ) {
-        read_label_ = true;
-    } else {
+    if (depth_low_action.compare("stop")!=0 ) {
         read_label_ = false;
+    } else {
+        read_label_ = true;
     }
 
     if (read_label_) {
-        std::cout <<  "try read label " << std::endl;
-        // send a goal to the action
-        ranger_librarian::LabelReadingGoal goal;
-        goal.camera_topic = RGB_IMAGE_TOPIC;
-        ac.sendGoal(goal);
-
-        //wait for the action to return
-        bool read_label_success_ = ac.waitForResult(ros::Duration(time_wait_read_label_));
-        if (read_label_success_) {
-            ranger_librarian::LabelReadingResultConstPtr result = ac.getResult();
-            ROS_INFO("Action finished: %s", result->author.c_str());
+        std::cout <<  "trying to read label " << std::endl;
+        //wait for book label
+        if (book_read_label()) {
 
             std::cout <<  "read label success! waiting for book " << std::endl;
 
             if (book_read_weight()) {
-                std::cout <<  "read book added! " << std::endl;
+                std::cout <<  "book add success! " << std::endl;
             } else {
-                std::cout <<  "read book add failed! " << std::endl;
+                std::cout <<  "book add failed! " << std::endl;
             }
-
 
         } else {
              std::cout <<  "read label failed, timeout " << std::endl;
+
         }
-
         read_label_ = false;
-
+        std::cout << "move around" << std::endl;
     }
-
 }
 
 void RangerLibrarian::scale_callback(const std_msgs::Float64& msg) {
@@ -159,7 +145,6 @@ void RangerLibrarian::scale_callback(const std_msgs::Float64& msg) {
     } else {
         weight_max_reached_ = false;
     }
-
     // implement control of max weight reached
 }
 
@@ -190,16 +175,12 @@ void RangerLibrarian::scale_filtered_callback(const ranger_librarian::WeightFilt
 /// SPINNER
 int RangerLibrarian::run() {
 
-    long int current_time;
+    std::cout << "move around" << std::endl;
 
     while (ros::ok()) {
 
-        current_time = ros::Time::now().toSec();
-
-//        std::cout << "move around" << std::endl;
-
-
-        ros::spinOnce();
+        //ros::spinOnce();
+        ros::getGlobalCallbackQueue()->callAvailable(ros::WallDuration(0.1));
         nh_rate_.sleep();
     }
 
@@ -213,7 +194,7 @@ bool RangerLibrarian::book_read_label() {
     ros::Time start_time = ros::Time::now();
     ros::Time run_time = ros::Time::now();
 
-
+    lr_.reset();
     lr_.readLabel(true);
 
     while (!read_success && (run_time-start_time < ros::Duration(time_wait_read_label_)) && ros::ok() ) {
@@ -236,8 +217,6 @@ bool RangerLibrarian::book_read_label() {
         last_book_add_.author = "";
         last_book_add_.callNumber = "";
     }
-
-    lr_.reset();
 
     return read_success;
 }

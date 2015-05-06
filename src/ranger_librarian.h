@@ -94,12 +94,12 @@ private:
     // depth image control parameters;
 
     //  scale callback
-    int weight_max_allowed_;         // maximum weight allowed
+    double weight_max_allowed_;         // maximum weight allowed
 
     // read label parameters
-    int time_depth_low_read_;            // time (s) for depth val = 0 to start label read
-    int time_wait_read_label_;           // time (s) to wait for reading a book label
-    int time_wait_add_book_;             // time (s) to wait for adding a book
+    double time_depth_low_read_;            // time (s) for depth val = 0 to start label read
+    double time_wait_read_label_;           // time (s) to wait for reading a book label
+    double time_wait_add_book_;             // time (s) to wait for adding a book
 
 
     //CLASS Members

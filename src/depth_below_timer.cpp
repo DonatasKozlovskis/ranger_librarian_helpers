@@ -10,6 +10,9 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 
+// other
+#include "../include/utils.h"
+
 using std::string;
 
 
