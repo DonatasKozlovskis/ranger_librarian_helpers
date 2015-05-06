@@ -80,7 +80,7 @@ include_directories(
 #add_executable( video_ocr video_ocr.cpp include/utils.cpp)
 #target_link_libraries( video_ocr ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable( main src/main.cpp src/label_reader.cpp src/ranger_librarian.cpp)
+add_executable( main src/main.cpp src/label_reader.cpp src/ranger_librarian.cpp include/utils.cpp)
 target_link_libraries( main ${catkin_LIBRARIES} ${Tesseract_LIBRARIES} )
 
 add_executable( depth_below_timer src/depth_below_timer.cpp)

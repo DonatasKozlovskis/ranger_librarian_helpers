@@ -24,5 +24,13 @@ enum NavigatorAction
     NAVIGATOR_FINISH
 };
 
+// navigator ACTIONS
+enum DepthLowCommand
+{
+    DEPTH_LOW_SLOW,
+    DEPTH_LOW_STOP,
+    DEPTH_LOW_STUCK
+};
+
 
 #endif // UTILS_H

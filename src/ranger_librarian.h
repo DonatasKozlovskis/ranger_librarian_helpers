@@ -26,7 +26,7 @@
 
 // other
 #include "label_reader.h"
-#include "include/utils.h"
+#include "../include/utils.h"
 #include <boost/thread.hpp>
 #include <cmath>
 
