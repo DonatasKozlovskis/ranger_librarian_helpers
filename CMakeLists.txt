@@ -40,6 +40,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
 	FILES
 	WeightFiltered.msg
+	NavigatorAction.msg
 )
 # Generate actions in the 'action' folder
 add_action_files(
@@ -100,7 +101,8 @@ target_link_libraries(label_reader_server ${catkin_LIBRARIES} ${Tesseract_LIBRAR
 
 install(
     TARGETS main depth_below_timer weight_change_monitor label_reader_server
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} )
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} 
+)
 
 
 
