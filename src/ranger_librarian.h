@@ -91,10 +91,9 @@ private:
 
 
     // NODE PARAMETERS
-    // depth image control parameters;
 
     //  scale callback
-    double weight_max_allowed_;         // maximum weight allowed
+    double weight_max_allowed_;             // maximum weight allowed
 
     // read label parameters
     double time_depth_low_read_;            // time (s) for depth val = 0 to start label read
@@ -110,7 +109,7 @@ private:
 
 
     // pointer to obtained cv image
-    cv_bridge::CvImagePtr cv_ptr;
+    cv_bridge::CvImagePtr cv_ptr_;
 
     // control boolean variables
     bool read_label_;

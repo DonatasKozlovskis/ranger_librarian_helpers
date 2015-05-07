@@ -60,19 +60,19 @@ void RangerLibrarian::rgb_callback(const sensor_msgs::ImageConstPtr& msg) {
 
     // get mutable cv image from cv_bridge::CvImagePtr cv_ptr;
     try {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        cv_ptr_ = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     } catch (cv_bridge::Exception& e) {
         ROS_ERROR("cv_bridge exception: %s", e.what());
         return;
     }
 
     // prepare user output image view
-    cv::Mat userImage = cv_ptr->image.clone();
+    cv::Mat userImage = cv_ptr_->image.clone();
     lr_.prepareUserImage(userImage);
 
 
     // process frame with orc if needed
-    read_label_success_ = lr_.processFrame(cv_ptr->image);
+    read_label_success_ = lr_.processFrame(cv_ptr_->image);
 
 
     // Update GUI Window
