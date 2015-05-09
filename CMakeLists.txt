@@ -90,9 +90,6 @@ target_link_libraries( depth_below_timer ${catkin_LIBRARIES} )
 add_executable( weight_change_monitor src/weight_change_monitor.cpp)
 target_link_libraries( weight_change_monitor ${catkin_LIBRARIES} )
 
-add_executable( user_view_creator src/user_view_creator.cpp)
-target_link_libraries( user_view_creator ${catkin_LIBRARIES} )
-
 add_executable(label_reader_server src/label_reader_server.cpp src/label_reader.cpp)
 target_link_libraries(label_reader_server ${catkin_LIBRARIES} ${Tesseract_LIBRARIES})
 
