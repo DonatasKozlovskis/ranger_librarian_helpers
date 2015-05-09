@@ -1,0 +1,20 @@
+<!-- not implemented -->
+<launch>
+	
+	<node pkg="ranger_librarian" type="label_reader_server" name="label_reader" output="screen"/>
+	<node pkg="ranger_librarian" type="weight_change_monitor" name="weight_change_monitor" output="screen">
+		<param name="scale_topic"			value="/scale"/>
+		<param name="scale_sensitivity"		value="0.1"/>
+		<param name="subset_size"			value="4"/>
+	</node>
+		
+	<node pkg="ranger_librarian" type="depth_below_timer" name="depth_below_timer" output="screen">
+		<param name="depth_image"				value="/camera/depth_registered/image_raw"/>
+		<param name="depth_below_threshold"		value="0.2"/>
+		<param name="depth_low_time_slow"		value="0.5"/>
+		<param name="depth_low_time_stop"		value="1.0"/>
+		<param name="depth_low_time_stuck"		value="10.0"/>
+	</node>
+	
+	
+</launch>
