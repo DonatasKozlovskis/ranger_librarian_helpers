@@ -177,7 +177,7 @@ double WeightChangeMonitor::weight_median() {
 /// Node publishes time (s) showing how long depth sensor is covered
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "depth_below_time_node");
+    ros::init(argc, argv, "weight_change_monitor_node");
     WeightChangeMonitor weight_monitor_node;
 
     ros::spin();
