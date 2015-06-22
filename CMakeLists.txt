@@ -1,3 +1,7 @@
+##############################################################################
+# CMake
+##############################################################################
+
 cmake_minimum_required(VERSION 2.8.3)
 project(ranger_librarian)
 
@@ -17,8 +21,10 @@ find_library(Tesseract_LIBRARIES NAMES tesseract_full tesseract_api tesseract
   /usr/lib
   /usr/local/lib)
   
-  
-  
+##############################################################################
+# Catkin
+##############################################################################
+
 # Find all required modules for compilation
 # catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
@@ -36,9 +42,9 @@ find_package(catkin REQUIRED COMPONENTS
     tf
 )
 
-################################################
-## Declare ROS messages, services and actions ##
-################################################
+##############################################################################
+# ROS messages, services and actions
+##############################################################################
 
 # Generate messages in the 'msg' folder
 add_message_files(
@@ -67,9 +73,6 @@ catkin_package(
 )
 
 
-###########
-## Build ##
-###########
 
 ## Specify additional locations of header files
 include_directories(
@@ -78,15 +81,10 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/src
 )
 
+##############################################################################
+# Build
+##############################################################################
 
-#add_executable( minimal_ocr minimal_ocr.cpp)
-#target_link_libraries( minimal_ocr ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
-
-#add_executable( video_ocr video_ocr.cpp include/utils.cpp)
-#target_link_libraries( video_ocr ${OpenCV_LIBS} ${Tesseract_LIBRARIES} ${Boost_LIBRARIES})
-
-add_executable( main src/main.cpp src/label_reader.cpp src/ranger_librarian.cpp include/utils.cpp)
-target_link_libraries( main ${catkin_LIBRARIES} ${Tesseract_LIBRARIES} )
 
 add_executable( depth_below_timer src/depth_below_timer.cpp)
 target_link_libraries( depth_below_timer ${catkin_LIBRARIES} )
@@ -97,11 +95,11 @@ target_link_libraries( weight_change_monitor ${catkin_LIBRARIES} )
 add_executable(label_reader_server src/label_reader_server.cpp src/label_reader.cpp)
 target_link_libraries(label_reader_server ${catkin_LIBRARIES} ${Tesseract_LIBRARIES})
 
-
-### install
-
+##############################################################################
+# Install
+##############################################################################
 install(
-    TARGETS main depth_below_timer weight_change_monitor label_reader_server
+    TARGETS depth_below_timer weight_change_monitor label_reader_server
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} 
 )
 
