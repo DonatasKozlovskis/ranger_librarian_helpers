@@ -1,0 +1,19 @@
+<!-- This launch file demonstrates the use of xtion ranger with rtabmap -->
+<launch>
+	<arg name="map_folder" value="maps" />
+	
+	<node pkg="ranger_librarian" name="mapper_control"	type="mapper_control.py" output="screen">
+		<param name="app_topic_frame_add"	value="frame_name_add_topic"/>
+		<param name="keypress_talker"		value="keypress_talker"/>
+		<param name="robot_touch_talker"	value="robot_touch_talker"/>
+	</node>
+	<node pkg="ranger_librarian" name="mapper"			type="mapper.py" output="screen">
+		<!-- location and file names -->
+		<param name="path_map"  value="$(find ranger_librarian)/$(arg map_folder)"/>
+		<param name="path_waypoint" value="$(find ranger_librarian)/$(arg map_folder)"/>
+		<param name="file_map" value="map"/>
+		<param name="file_waypoint" value="waypoints"/>
+		<!-- fixed frame name, e.g. "map" or "odom" -->
+		<param name="fixed_frame" value="map"/>
+	</node>
+</launch>

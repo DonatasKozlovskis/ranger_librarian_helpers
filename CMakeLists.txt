@@ -29,7 +29,11 @@ find_package(catkin REQUIRED COMPONENTS
 	actionlib
 	std_msgs
 	sensor_msgs
+    geometry_msgs
+    nav_msgs
+    std_msgs
 	message_generation
+    tf
 )
 
 ################################################
@@ -101,8 +105,14 @@ install(
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} 
 )
 
-
-
 # Instructions to install launch files
 install(DIRECTORY launch/
-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch )
+    	DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch )
+    	
+# Instructions to install map file folder
+install(DIRECTORY maps/
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/maps )    	
+    
+#And this will install python nodes
+install(DIRECTORY scripts/
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION} USE_SOURCE_PERMISSIONS)
