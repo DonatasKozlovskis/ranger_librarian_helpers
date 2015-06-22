@@ -83,7 +83,7 @@ void LabelReader::defineLabelRegion(int img_width, int img_height) {
 
 }
 
-bool LabelReader::processFrame(cv::Mat &inputFrame) {
+bool LabelReader::processFrame(const cv::Mat &inputFrame) {
 
     if (inputFrame.cols != imgWidth || inputFrame.rows != imgHeight) {
         defineLabelRegion(inputFrame.cols, inputFrame.rows);

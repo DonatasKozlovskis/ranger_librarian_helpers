@@ -91,7 +91,7 @@ public:
   void readLabel(bool read);
 
   // process frame
-  bool processFrame(cv::Mat &inputFrame);
+  bool processFrame(const cv::Mat &inputFrame);
 
   // prepare user image
   void prepareUserImage(cv::Mat &inputFrame);
