@@ -1,8 +1,8 @@
 <package>
-  <name>ranger_librarian</name>
+  <name>ranger_librarian_helpers</name>
   <version>0.0.0</version>
   <description>
-      Package dedicated for controlling ranger box as a book collector
+      Package dedicated for controlling Ranger robot sensors, rgb-d mapping and navigation using Ranger Librarian scenario
   </description>
   <maintainer email="donatas.kozlovskis@epfl.ch">Donatas Kozlovskis</maintainer>
   <license>BSD</license>
